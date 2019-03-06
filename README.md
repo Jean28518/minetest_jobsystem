@@ -7,6 +7,7 @@ You can change your job after 10 hours servertime. That can be changed (see belo
 ## For what can I use this mod?
 To handle the jobs of the players. On my server I use this mod in combination with adminshop, which supports licenses (jobsystem is based on licenses). So a player in a specific job can sell/buy some items to better prices for example.
 
+licenses mod on GitHub: https://github.com/Jean28518/minetest_licenses
 
 ## How to use:
 `job` Display help
