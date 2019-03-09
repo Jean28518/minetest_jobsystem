@@ -10,11 +10,11 @@ To handle the jobs of the players. On my server I use this mod in combination wi
 licenses mod on GitHub: https://github.com/Jean28518/minetest_licenses
 
 ## How to use:
-`job` Display help
+`job` Displays help
 
-`job info` Display your current job
+`job info` Displays your current job
 
-`job acquire <job_name>`
+`job acquire <job_name>` Aqcuire a job
 
 
 ### Pre Configured Jobs:

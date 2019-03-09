@@ -61,10 +61,11 @@ minetest.register_chatcommand("job", {
     if param == "info" then
       minetest.chat_send_player(player, "You are "..pmeta:get_string("job:job"))
     elseif mode ~= "acquire" and job ~= " acquire" then
-      minetest.chat_send_player(player, "To acquire an job: " ..
-      "\njob acquire: <job_name>" ..
+      minetest.chat_send_player(player, ..
+      "job acquire <job_name>: Aqcuire a job" ..
       -- Add here job:
-      "\njobs: miner, farmer, hunter, builder")
+      "\njobs: miner, farmer, hunter, builder"..
+      "\njob info: Displays your current job")
 
     end
   end
