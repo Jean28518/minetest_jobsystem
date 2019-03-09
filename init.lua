@@ -24,7 +24,7 @@ minetest.register_chatcommand("job", {
       return
     end
     if mode == "acquire" then
-      if minetest.get_gametime() - aqtime < DINGSTIME then
+      if minetest.get_gametime() - aqtime < DINGSTIME and minetest.get_gametime() > DINGSTIME then
         minetest.chat_send_player(player, "You can only change your job every " .. DINGSTIME .. " seconds!")
       else
         local changed = true
@@ -59,9 +59,14 @@ minetest.register_chatcommand("job", {
       end
     end
     if param == "info" then
-      minetest.chat_send_player(player, "You are "..pmeta:get_string("job:job"))
+      local currentjob = pmeta:get_string("job:job")
+      if currentjob == "" then
+        minetest.chat_send_player(player, "You don't have any job at time!")
+      else
+        minetest.chat_send_player(player, "You are ".. currentjob)
+      end
     elseif mode ~= "acquire" and job ~= " acquire" then
-      minetest.chat_send_player(player, ..
+      minetest.chat_send_player(player, ""..
       "job acquire <job_name>: Aqcuire a job" ..
       -- Add here job:
       "\njobs: miner, farmer, hunter, builder"..

@@ -16,6 +16,8 @@ licenses mod on GitHub: https://github.com/Jean28518/minetest_licenses
 
 `job acquire <job_name>` Aqcuire a job
 
+**The blocking time (default 10 hours) does only work correctly, when the minetest gametime (=the server gametime) is greater  than this configured block time** *The Server should ever had run 10 hours before once (whitch the same world)*
+
 
 ### Pre Configured Jobs:
 `miner`, `farmer`,`hunter`, `builder`
