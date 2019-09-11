@@ -1,11 +1,22 @@
 -- Add here job:
 licenses_add("miner")
 licenses_add("farmer")
-licenses_add("hunter")
 licenses_add("builder")
 
--- Change here Countdown:
-DINGSTIME = 36000
+jobsystem = {}
+
+
+local COOLDOWN_IN_SECONDS = 36000 -- Define here the cooldown time after hireing a new job in Seconds.
+
+-- Advanced Builder
+local ADVANCED_BUILDER = false -- Change this to true, if you have jeans_economy activated and want, that a Builder gets money for building blocks.
+local ACCOUNTING_PERIOD = 299 -- Unit: Seconds
+local REVENUE = 0.1 -- Revenue per builded Block
+
+
+local buildedBlocks = {}
+ADVANCED_BUILDER = minetest.get_modpath("jeans_economy") and ADVANCED_BUILDER
+
 
 minetest.register_chatcommand("job", {
   privs = {
@@ -24,27 +35,20 @@ minetest.register_chatcommand("job", {
       return
     end
     if mode == "acquire" then
-      if minetest.get_gametime() - aqtime < DINGSTIME and minetest.get_gametime() > DINGSTIME then
-        minetest.chat_send_player(player, "You can only change your job every " .. DINGSTIME .. " seconds!")
+      if minetest.get_gametime() - aqtime < COOLDOWN_IN_SECONDS and minetest.get_gametime() > COOLDOWN_IN_SECONDS then
+        minetest.chat_send_player(player, "You can only change your job every " .. COOLDOWN_IN_SECONDS .. " seconds!")
       else
         local changed = true
         --- Add here job:
         if job == "miner" then
           licenses_unassign(player, "farmer")
-          licenses_unassign(player, "hunter")
           licenses_unassign(player, "builder")
         elseif job == "farmer" then
           licenses_unassign(player, "miner")
-          licenses_unassign(player, "hunter")
-          licenses_unassign(player, "builder")
-        elseif job == "hunter" then
-          licenses_unassign(player, "miner")
-          licenses_unassign(player, "farmer")
           licenses_unassign(player, "builder")
         elseif job == "builder" then
           licenses_unassign(player, "miner")
           licenses_unassign(player, "farmer")
-          licenses_unassign(player, "hunter")
         else
           minetest.chat_send_player(player, "Job not known")
           changed = false
@@ -75,3 +79,28 @@ minetest.register_chatcommand("job", {
     end
   end
 })
+
+if ADVANCED_BUILDER then
+  minetest.after(ACCOUNTING_PERIOD, function() jobsystem.accounting() end)
+end
+
+function jobsystem.accounting()
+  for name, blocks in pairs(buildedBlocks) do
+    local payout = math.floor(blocks*REVENUE)
+    if payout > 0 then
+      jeans_economy_book("!SERVER!", name, payout, "Payout for builded Blocks")
+    end
+  end
+  buildedBlocks = {}
+  minetest.after(ACCOUNTING_PERIOD, function() jobsystem.accounting() end)
+end
+
+minetest.register_on_placenode(function(pos, newnode, placer, oldnode, itemstack, pointed_thing)
+  if ADVANCED_BUILDER and licenses_check_player_by_licese(placer:get_player_name(), "builder") then
+    if buildedBlocks[placer:get_player_name()] == nil then
+      buildedBlocks[placer:get_player_name()] = 1
+    else
+      buildedBlocks[placer:get_player_name()] = buildedBlocks[placer:get_player_name()] + 1
+    end
+  end
+end)
