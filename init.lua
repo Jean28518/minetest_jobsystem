@@ -5,24 +5,32 @@ licenses_add("builder")
 
 jobsystem = {}
 
-
+--------------------------------------------------------------------------------
+-- Configuration:
+--------------------------------------------------------------------------------
 local COOLDOWN_IN_SECONDS = 36000 -- Define here the cooldown time after hireing a new job in Seconds.
 
 -- Advanced Builder
 local ADVANCED_BUILDER = false -- Change this to true, if you have jeans_economy activated and want, that a Builder gets money for building blocks.
 local ACCOUNTING_PERIOD = 299 -- Unit: Seconds
 local REVENUE = 0.1 -- Revenue per builded Block
+--------------------------------------------------------------------------------
 
 
 local buildedBlocks = {}
-ADVANCED_BUILDER = minetest.get_modpath("jeans_economy") and ADVANCED_BUILDER
+local ADVANCED_BUILDER = minetest.get_modpath("jeans_economy") and ADVANCED_BUILDER
 
 
 minetest.register_chatcommand("job", {
   privs = {
       interact = true,
   },
-
+  params = "acquire/info <job>",
+  description = "Handles your current job.\n"..
+  "job acquire <job_name>: Aqcuire a job" ..
+  -- Add here job:
+  "\njobs: miner, farmer, builder"..
+  "\njob info: Displays your current job",
   func = function(player, param)
     local mode, job = param:match('^(%S+)%s(.+)$')
     local pmeta = minetest.get_player_by_name(player):get_meta()
@@ -35,7 +43,7 @@ minetest.register_chatcommand("job", {
       return
     end
     if mode == "acquire" then
-      if minetest.get_gametime() - aqtime < COOLDOWN_IN_SECONDS and minetest.get_gametime() > COOLDOWN_IN_SECONDS then
+      if minetest.get_gametime() - aqtime < COOLDOWN_IN_SECONDS then
         minetest.chat_send_player(player, "You can only change your job every " .. COOLDOWN_IN_SECONDS .. " seconds!")
       else
         local changed = true
@@ -55,6 +63,7 @@ minetest.register_chatcommand("job", {
         end
         if changed then
           licenses_assign(player, job)
+          minetest.log("action", player.." acquires the job "..job)
           minetest.chat_send_player(player, "You are "..job.." now")
           aqtime= minetest.get_gametime()
           pmeta:set_int("job:aqtime", aqtime)
@@ -73,13 +82,16 @@ minetest.register_chatcommand("job", {
       minetest.chat_send_player(player, ""..
       "job acquire <job_name>: Aqcuire a job" ..
       -- Add here job:
-      "\njobs: miner, farmer, hunter, builder"..
+      "\njobs: miner, farmer, builder"..
       "\njob info: Displays your current job")
 
     end
   end
 })
 
+--------------------------------------------------------------------------------
+-- Handle advanced Builder Mode:
+--------------------------------------------------------------------------------
 if ADVANCED_BUILDER then
   minetest.after(ACCOUNTING_PERIOD, function() jobsystem.accounting() end)
 end
