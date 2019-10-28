@@ -196,42 +196,42 @@ minetest.register_chatcommand("jobadmin", {
     -- jobadmin time_acquire <player> <job>
 --------------------------------------------------------------------------------
 
--- local mode, player, job = string.match(param, "(%S+) (%S+) (%S+)")
--- if mode == "time_acquire" and player ~= nil and job ~= nil then
---  if not minetest.player_exists(player) then
---    minetest.chat_send_player(admin, "Player not found" )
---    return
---  end
---
---  if minetest.get_gametime() - aqtime < COOLDOWN_IN_SECONDS then
---    minetest.chat_send_player(player, "You can only change your job every " .. COOLDOWN_IN_SECONDS .. " seconds!")
---  else
---    local changed = true
+--[[ local mode, player, job = string.match(param, "(%S+) (%S+) (%S+)")
+ if mode == "time_acquire" and player ~= nil and job ~= nil then
+  if not minetest.player_exists(player) then
+    minetest.chat_send_player(admin, "Player not found" )
+    return
+  end
 
-  -- Add here job:
+  if minetest.get_gametime() - aqtime < COOLDOWN_IN_SECONDS then
+    minetest.chat_send_player(player, "You can only change your job every " .. COOLDOWN_IN_SECONDS .. " seconds!")
+  else
+    local changed = true
 
---  if job == "miner" then
---    licenses.revoke(player, "farmer")
---    licenses_unassign(player, "builder")
---    licenses.assign(player, "miner")
---  elseif job == "farmer" then
---    licenses_unassign(player, "miner")
---    licenses_unassign(player, "builder")
---    licenses.assign(player, "farmer")
---  elseif job == "builder" then
---    licenses_unassign(player, "miner")
---    licenses_unassign(player, "farmer")
---    licenses.assign(player, "builder")
---  else
---    minetest.chat_send_player(admin, "Job not found" )
---    return
---  end
---  minetest.chat_send_player(admin, "Job "..job .." sucessfully assigned to "..player)
---  minetest.log("action", admin .. " assigns the job "..job.." to "..player)
---  return
---end
---end
+ -- Add here job:
 
+  if job == "miner" then
+    licenses.revoke(player, "farmer")
+    licenses_unassign(player, "builder")
+    licenses.assign(player, "miner")
+  elseif job == "farmer" then
+    licenses_unassign(player, "miner")
+    licenses_unassign(player, "builder")
+    licenses.assign(player, "farmer")
+  elseif job == "builder" then
+    licenses_unassign(player, "miner")
+    licenses_unassign(player, "farmer")
+    licenses.assign(player, "builder")
+  else
+    minetest.chat_send_player(admin, "Job not found" )
+    return
+  end
+  minetest.chat_send_player(admin, "Job "..job .." sucessfully assigned to "..player)
+  minetest.log("action", admin .. " assigns the job "..job.." to "..player)
+  return
+end
+end
+]]
 
     -- jobadmin info <player>
 --------------------------------------------------------------------------------
