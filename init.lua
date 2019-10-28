@@ -1,3 +1,5 @@
+-- For jobadmin you need the priv "jobadmin"
+
 -- Add here job:
 licenses_add("miner")
 licenses_add("farmer")
@@ -20,6 +22,9 @@ local REVENUE = 0.1 -- Revenue per builded Block
 local buildedBlocks = {}
 local ADVANCED_BUILDER = minetest.get_modpath("jeans_economy") and ADVANCED_BUILDER
 
+--------------------------------------------------------------------------------
+-- User Command for Job:
+--------------------------------------------------------------------------------
 
 minetest.register_chatcommand("job", {
   privs = {
@@ -27,10 +32,15 @@ minetest.register_chatcommand("job", {
   },
   params = "acquire/info <job>",
   description = "Handles your current job.\n"..
-  "job acquire <job_name>: Aqcuire a job" ..
+  "To acquire a Job:"..
+  "\n /job acquire <job_name>" ..
+  "\n <---->" ..
+  "\nAvaible jobs:"..
   -- Add here job:
-  "\njobs: miner, farmer, builder"..
-  "\njob info: Displays your current job",
+  "\n miner, farmer, builder"..
+  "\n <---->" ..
+  "\n Displays your current job:"..
+  "\n /job info",
   func = function(player, param)
     local mode, job = param:match('^(%S+)%s(.+)$')
     local pmeta = minetest.get_player_by_name(player):get_meta()
@@ -80,13 +90,18 @@ minetest.register_chatcommand("job", {
       end
     elseif mode ~= "acquire" and job ~= " acquire" then
       minetest.chat_send_player(player, ""..
-      "job acquire <job_name>: Aqcuire a job" ..
-      -- Add here job:
-      "\njobs: miner, farmer, builder"..
-      "\njob info: Displays your current job")
+     "To acquire a Job:"..
+     "\n /job acquire <job_name>" ..
+     "\n <---->" ..
+     "\nAvaible jobs:"..
+     -- Add here job:
+     "\n miner, farmer, builder"..
+     "\n <---->" ..
+     "\n Displays your current job:"..
+     "\n /job info")
+   end
+ end
 
-    end
-  end
 })
 
 --------------------------------------------------------------------------------
@@ -116,3 +131,84 @@ minetest.register_on_placenode(function(pos, newnode, placer, oldnode, itemstack
     end
   end
 end)
+
+--------------------------------------------------------------------------------
+-- Admin Command for Job:
+--------------------------------------------------------------------------------
+
+-- Register the jobadmin command priv
+
+  minetest.register_privilege("jobadmin", {
+  description = "Admin can change the Job for Users",
+  give_to_singleplayer = false,
+  give_to_admin = true,
+})
+
+minetest.register_chatcommand("jobadmin", {
+
+-- command
+  privs = {
+      jobadmin = true,
+  },
+  params = "acquire/info <player> <job>",
+  description = "Handles Players current job.\n"..
+  "To acquire a Player Job:"..
+  "\n /jobadmin acquire <player> <job_name>" ..
+  "\n <---->" ..
+  "\nAvaible jobs:"..
+  -- Add here job:
+  "\n miner, farmer, builder"..
+  "\n <---->" ..
+  "\n Displays Players current job:"..
+  "\n /jobadmin info <player>",
+  func = function(admin, param)
+    local mode, player, job = string.match(param, "(%S+) (%S+) (%S+)")
+    --local pmeta = minetest.get_player_by_name(player):get_meta()
+    if mode == "acquire" and player ~= nil and job ~= nil then
+      if not minetest.player_exists(player) then
+        minetest.chat_send_player(admin, "Player not found" )
+        return
+      end
+      if job == "miner" then
+        licenses.revoke(player, "farmer")
+        licenses_unassign(player, "builder")
+        licenses.assign(player, "miner")
+      elseif job == "farmer" then
+        licenses_unassign(player, "miner")
+        licenses_unassign(player, "builder")
+        licenses.assign(player, "farmer")
+      elseif job == "builder" then
+        licenses_unassign(player, "miner")
+        licenses_unassign(player, "farmer")
+        licenses.assign(player, "builder")
+      else
+        minetest.chat_send_player(admin, "Job not found" )
+        return
+      end
+      minetest.chat_send_player(admin, "Job "..job .." sucessfully assigned to "..player)
+      minetest.log("action", admin .. " assigns the job "..job.." to "..player)
+      return
+    end
+
+    mode, player = string.match(param, "(%S+) (%S+)")
+    if mode == "info" and player ~= nil then
+      if not minetest.player_exists(player) then
+        minetest.chat_send_player(admin, "Player not found" )
+        return
+      end
+
+      if licenses.check(player, "miner") then
+        minetest.chat_send_player(admin, "Player "..player.." is miner." )
+      elseif licenses.check(player, "farmer") then
+        minetest.chat_send_player(admin, "Player "..player.." is farmer." )
+      elseif licenses.check(player, "builder") then
+        minetest.chat_send_player(admin, "Player "..player.." is builder." )
+      else
+        minetest.chat_send_player(admin, "Player "..player.." has no job yet." )
+      end
+      return
+    end
+
+    minetest.chat_send_player(admin, "For correct use see /help jobadmin" )
+  end
+})
