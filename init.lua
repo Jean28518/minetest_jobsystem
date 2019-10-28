@@ -146,7 +146,7 @@ end)
 
 minetest.register_chatcommand("jobadmin", {
 
--- command
+
   privs = {
       jobadmin = true,
   },
@@ -162,13 +162,16 @@ minetest.register_chatcommand("jobadmin", {
   "\n Displays Players current job:"..
   "\n /jobadmin info <player>",
   func = function(admin, param)
+
+        -- jobadmin acquire <player> <job>
+--------------------------------------------------------------------------------
     local mode, player, job = string.match(param, "(%S+) (%S+) (%S+)")
-    --local pmeta = minetest.get_player_by_name(player):get_meta()
     if mode == "acquire" and player ~= nil and job ~= nil then
       if not minetest.player_exists(player) then
         minetest.chat_send_player(admin, "Player not found" )
         return
       end
+      -- Add here job:
       if job == "miner" then
         licenses.revoke(player, "farmer")
         licenses_unassign(player, "builder")
@@ -190,6 +193,9 @@ minetest.register_chatcommand("jobadmin", {
       return
     end
 
+
+    -- jobadmin info <player>
+--------------------------------------------------------------------------------
     mode, player = string.match(param, "(%S+) (%S+)")
     if mode == "info" and player ~= nil then
       if not minetest.player_exists(player) then

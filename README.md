@@ -9,7 +9,7 @@ To handle the jobs of the players. On my server I use this mod in combination wi
 
 licenses mod on GitHub: https://github.com/Jean28518/minetest_licenses
 
-## How to use:
+## How to use for Players:
 `job` Displays help
 
 `job info` Displays your current job
@@ -17,6 +17,18 @@ licenses mod on GitHub: https://github.com/Jean28518/minetest_licenses
 `job acquire <job_name>` Aqcuire a job
 
 **The blocking time (default 10 hours) does only work correctly, when the minetest gametime (=the server gametime) is greater  than this configured block time** *The Server should ever had run 10 hours before once (whitch the same world)*
+
+## How to use for Admins:
+
+**Admins need the *Privilege* `jobadmin`**
+
+**jobadmin ignore the timer!**
+
+`help jobadmin` Displays help
+
+`jobadmin info <player>` Displays the current job of a Player
+
+`jobadmin acquire <player> <job_name>` Aqcuire a job for a Player
 
 
 ### Pre Configured Jobs:
